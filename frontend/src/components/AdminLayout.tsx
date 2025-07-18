@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Plus, Settings, ArrowLeft, User, LogOut } from 'lucide-react';
+import { Home, Plus, ArrowLeft, User, LogOut } from 'lucide-react';
 import { useUser, useClerk } from '@clerk/clerk-react';
 
 const AdminLayout = () => {
