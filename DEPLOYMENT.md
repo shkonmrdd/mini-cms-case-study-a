@@ -55,14 +55,14 @@ This guide covers deployment options for the Mini CMS application.
 
 4. Environment Variables:
    ```
-   VITE_API_BASE_URL=https://mini-cms-backend.onrender.com/api
+   VITE_API_BASE_URL=https://mini-cms-case-study.onrender.com/api
    VITE_CLERK_PUBLISHABLE_KEY=<your-clerk-key>
    ```
 
 ### Step 4: Update CORS (Important!)
 Your backend is already configured for production CORS. Make sure your Render URLs match:
 - Frontend URL: `https://mini-cms-frontend.onrender.com`
-- Backend URL: `https://mini-cms-backend.onrender.com`
+- Backend URL: `https://mini-cms-case-study.onrender.com`
 
 ---
 

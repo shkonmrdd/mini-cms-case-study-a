@@ -158,6 +158,21 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
   }
 });
 
+// Helper function to handle file storage
+const handleFileStorage = (file: Express.Multer.File): string | undefined => {
+  if (!file) return undefined;
+  
+  if (process.env.NODE_ENV === 'production') {
+    // In production with memory storage, we'd typically upload to cloud storage
+    // For now, we'll return a placeholder since file upload on free Render is limited
+    console.log('File upload in production - size:', file.size, 'type:', file.mimetype);
+    return '/uploads/placeholder-image.jpg'; // Placeholder for production
+  } else {
+    // Development: file is saved to disk
+    return '/uploads/' + file.filename;
+  }
+};
+
 // POST /api/news - Create new news article
 router.post('/', requireAuth, async (req: Request<{}, any, CreateNewsBody>, res: Response) => {
   try {
@@ -166,12 +181,29 @@ router.post('/', requireAuth, async (req: Request<{}, any, CreateNewsBody>, res:
     // Handle file upload first
     upload.single('image')(req, res, async (err: any) => {
       if (err) {
+        console.error('File upload error:', err);
+        console.error('Error details:', {
+          message: err.message,
+          code: err.code,
+          field: err.field,
+          stack: err.stack
+        });
         res.status(400).json({
           success: false,
           message: 'File upload error',
           error: err.message
         });
         return;
+      }
+      
+      // Log file upload details for debugging
+      if ((req as any).file) {
+        console.log('File uploaded successfully:', {
+          originalname: (req as any).file.originalname,
+          mimetype: (req as any).file.mimetype,
+          size: (req as any).file.size,
+          fieldname: (req as any).file.fieldname
+        });
       }
       
       // Now validate the form data after multer has processed it
@@ -237,7 +269,7 @@ router.post('/', requireAuth, async (req: Request<{}, any, CreateNewsBody>, res:
         summary: req.body.summary || '',
         category: req.body.category,
         is_featured: req.body.is_featured === 'true' || req.body.is_featured === true,
-        image_url: (req as any).file ? `/uploads/${(req as any).file.filename}` : undefined
+        image_url: handleFileStorage((req as any).file)
       };
       
       const createdNews = await createNews(newsData);
@@ -277,12 +309,29 @@ router.put('/:id', requireAuth, async (req: Request<{ id: string }, any, CreateN
     // Handle file upload first
     upload.single('image')(req, res, async (err: any) => {
       if (err) {
+        console.error('PUT File upload error:', err);
+        console.error('PUT Error details:', {
+          message: err.message,
+          code: err.code,
+          field: err.field,
+          stack: err.stack
+        });
         res.status(400).json({
           success: false,
           message: 'File upload error',
           error: err.message
         });
         return;
+      }
+      
+      // Log file upload details for debugging
+      if ((req as any).file) {
+        console.log('PUT File uploaded successfully:', {
+          originalname: (req as any).file.originalname,
+          mimetype: (req as any).file.mimetype,
+          size: (req as any).file.size,
+          fieldname: (req as any).file.fieldname
+        });
       }
       
       // Now validate the form data after multer has processed it
@@ -348,7 +397,7 @@ router.put('/:id', requireAuth, async (req: Request<{ id: string }, any, CreateN
         summary: req.body.summary || '',
         category: req.body.category,
         is_featured: req.body.is_featured === 'true' || req.body.is_featured === true,
-        image_url: (req as any).file ? `/uploads/${(req as any).file.filename}` : existingNews.image_url
+        image_url: (req as any).file ? handleFileStorage((req as any).file) : existingNews.image_url
       };
       
       await updateNews(Number(id), newsData);

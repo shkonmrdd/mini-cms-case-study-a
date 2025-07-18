@@ -34,24 +34,36 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded images
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
-// Configure multer for file uploads
-const storage: StorageEngine = multer.diskStorage({
-  destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-    cb(null, path.join(__dirname, '../uploads'));
-  },
-  filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-    const uniqueName = uuidv4() + path.extname(file.originalname);
-    cb(null, uniqueName);
+// Create uploads directory if it doesn't exist (production-safe)
+const uploadsDir = path.join(__dirname, '../uploads');
+try {
+  if (!require('fs').existsSync(uploadsDir)) {
+    require('fs').mkdirSync(uploadsDir, { recursive: true });
   }
-});
+} catch (error) {
+  console.warn('Could not create uploads directory:', error);
+}
+
+// Serve uploaded images
+app.use('/uploads', express.static(uploadsDir));
+
+// Configure multer for file uploads with production-safe settings
+const storage: StorageEngine = process.env.NODE_ENV === 'production' 
+  ? multer.memoryStorage() // Use memory storage for production
+  : multer.diskStorage({
+      destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+        cb(null, uploadsDir);
+      },
+      filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+        const uniqueName = uuidv4() + path.extname(file.originalname);
+        cb(null, uniqueName);
+      }
+    });
 
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    fileSize: process.env.NODE_ENV === 'production' ? 2 * 1024 * 1024 : 5 * 1024 * 1024 // 2MB for production, 5MB for dev
   },
   fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
@@ -68,6 +80,14 @@ const upload = multer({
 
 // Make upload middleware available
 app.locals.upload = upload;
+
+// Add request logging for debugging
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (req.method !== 'GET') {
+    console.log(`${req.method} ${req.path} - Content-Type: ${req.headers['content-type']} - Size: ${req.headers['content-length']}`);
+  }
+  next();
+});
 
 // Routes
 app.use('/api/news', newsRoutes);
