@@ -13,6 +13,17 @@ export default {
           600: '#2563eb',
           700: '#1d4ed8',
         },
+        beige: {
+          50: '#FAF6EF',
+          100: '#F5EFDD',
+          200: '#EBE0C4',
+          300: '#E0D1AB',
+        },
+        navy: {
+          900: '#001C3F',
+          800: '#002850',
+          700: '#003566',
+        },
         accent: {
           orange: '#fb923c',
           green: '#22c55e',

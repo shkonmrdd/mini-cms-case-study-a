@@ -10,9 +10,9 @@ const AdminLayout = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+    <div className="h-screen bg-gray-100 flex flex-col">
+      {/* Header - Sticky */}
+      <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -45,9 +45,10 @@ const AdminLayout = () => {
         </div>
       </header>
 
-      <div className="flex">
+      {/* Main Layout Container */}
+      <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-sm min-h-screen">
+        <aside className="w-64 bg-white shadow-sm flex-shrink-0 overflow-y-auto">
           {/* Back to Public Site */}
           <div className="px-4 pt-6 pb-4 border-b border-gray-200">
             <Link
@@ -94,7 +95,7 @@ const AdminLayout = () => {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 overflow-y-auto bg-gray-100 p-8">
           <Outlet />
         </main>
       </div>

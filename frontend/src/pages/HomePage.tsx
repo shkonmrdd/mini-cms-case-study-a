@@ -16,34 +16,60 @@ const HomePage = () => {
 
   if (featuredLoading || latestLoading) {
     return (
-      <div className="flex justify-center items-center min-h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '256px' 
+      }}>
+        <div style={{
+          width: '48px',
+          height: '48px',
+          border: '2px solid var(--border)',
+          borderTop: '2px solid var(--primary)',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }}></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div>
       {/* Featured News */}
       {featuredNews && (
-        <section>
-          <NewsCard news={featuredNews} featured />
-        </section>
+        <article className="hero">
+          <h1>{featuredNews.title}</h1>
+          <img
+            src={featuredNews.image_url || `https://images.unsplash.com/photo-1504711434969-e33886168f5c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80`}
+            alt={featuredNews.title}
+          />
+          <p className="date">
+            {new Date(featuredNews.created_at).toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </p>
+          <p className="excerpt">
+            {featuredNews.summary || featuredNews.content.substring(0, 240) + '...'}
+          </p>
+        </article>
       )}
 
       {/* Latest News Section */}
       <section>
-        <h2 className="text-2xl font-bold text-orange-600 mb-6">Latest News</h2>
+        <h2 className="section">Latest News</h2>
         
         {latestNews && latestNews.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          <div className="cards">
             {latestNews.map((news) => (
               <NewsCard key={news.id} news={news} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-600">No latest news available.</p>
+          <div style={{ textAlign: 'center', padding: '48px 0' }}>
+            <p style={{ color: 'var(--muted)' }}>No latest news available.</p>
           </div>
         )}
       </section>

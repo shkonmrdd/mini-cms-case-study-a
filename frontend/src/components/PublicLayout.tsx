@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, User } from 'lucide-react';
+import { User, LayoutDashboard } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 
@@ -20,76 +20,71 @@ const PublicLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold text-gray-900">
-                News
-              </Link>
-            </div>
+      <header className="header">
+        <Link to="/" className="label">
+          News
+        </Link>
 
-            {/* Search */}
-            <div className="flex-1 max-w-lg mx-8">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-                <button
-                  type="submit"
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <Search size={20} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <form onSubmit={handleSearch}>
+            <input
+              type="text"
+              placeholder="Search…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search"
+            />
+          </form>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px',
+                  color: 'var(--primary)',
+                  border: 'none',
+                  background: 'none',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>
+                  <User size={20} />
+                  <span>Admin</span>
                 </button>
-              </form>
-            </div>
-
-            {/* Authentication */}
-            <div className="flex items-center space-x-4">
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <button className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
-                    <User size={20} />
-                    <span>Admin</span>
-                  </button>
-                </SignInButton>
-              </SignedOut>
-              <SignedIn>
-                <div className="flex items-center space-x-3">
-                  <Link
-                    to="/admin"
-                    className="text-gray-600 hover:text-gray-900 transition-colors font-medium"
-                  >
-                    Admin Panel
-                  </Link>
-                  <UserButton />
-                </div>
-              </SignedIn>
-            </div>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Link
+                  to="/admin"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '32px',
+                    height: '32px',
+                    color: 'var(--primary)',
+                    borderRadius: 'var(--radius-s)',
+                    textDecoration: 'none',
+                  }}
+                  title="Admin Panel"
+                >
+                  <LayoutDashboard size={20} />
+                </Link>
+                <UserButton />
+              </div>
+            </SignedIn>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="main">
         <Outlet />
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-600">
-            <p>&copy; 2024 Mini CMS News Portal. Built with AI-generated code.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
