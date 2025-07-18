@@ -1,6 +1,7 @@
 import { Outlet, Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 
 const PublicLayout = () => {
   const navigate = useNavigate();
@@ -50,14 +51,27 @@ const PublicLayout = () => {
               </form>
             </div>
 
-            {/* Admin Link */}
+            {/* Authentication */}
             <div className="flex items-center space-x-4">
-              <Link
-                to="/admin"
-                className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
-              >
-                Admin Panel
-              </Link>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
+                    <User size={20} />
+                    <span>Admin</span>
+                  </button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <div className="flex items-center space-x-3">
+                  <Link
+                    to="/admin"
+                    className="text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                  >
+                    Admin Panel
+                  </Link>
+                  <UserButton />
+                </div>
+              </SignedIn>
             </div>
           </div>
         </div>

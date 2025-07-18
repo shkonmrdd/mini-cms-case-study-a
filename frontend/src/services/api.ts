@@ -8,6 +8,13 @@ import {
   NewsSearchParams 
 } from '../types/news';
 
+// Global token storage - will be set by auth hook
+let authToken: string | null = null;
+
+export const setAuthToken = (token: string | null) => {
+  authToken = token;
+};
+
 const API_BASE_URL = 'http://localhost:5001/api';
 
 const api = axios.create({
@@ -15,10 +22,16 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// Request interceptor for logging
+// Request interceptor for logging and auth
 api.interceptors.request.use(
   (config) => {
     console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    
+    // Add auth token for protected routes
+    if (authToken && (config.method === 'post' || config.method === 'put' || config.method === 'delete')) {
+      config.headers.Authorization = `Bearer ${authToken}`;
+    }
+    
     return config;
   },
   (error) => {

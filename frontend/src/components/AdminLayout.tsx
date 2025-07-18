@@ -1,8 +1,11 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Plus, Settings, ArrowLeft } from 'lucide-react';
+import { Home, Plus, Settings, ArrowLeft, User, LogOut } from 'lucide-react';
+import { useUser, useClerk } from '@clerk/clerk-react';
 
 const AdminLayout = () => {
   const location = useLocation();
+  const { user } = useUser();
+  const { signOut } = useClerk();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -19,8 +22,26 @@ const AdminLayout = () => {
               </h1>
             </div>
 
-            {/* Back to Public Site */}
-            <div className="flex items-center">
+            {/* User Menu and Back to Public Site */}
+            <div className="flex items-center space-x-4">
+              {/* User Info */}
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 text-gray-700">
+                  <User size={20} />
+                  <span className="font-medium">
+                    {user?.firstName || user?.emailAddresses[0]?.emailAddress || 'Admin'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => signOut()}
+                  className="flex items-center space-x-1 text-gray-600 hover:text-red-600 transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut size={18} />
+                </button>
+              </div>
+              
+              {/* Back to Public Site */}
               <Link
                 to="/"
                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"

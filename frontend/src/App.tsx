@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
 import PublicLayout from './components/PublicLayout';
 import AdminLayout from './components/AdminLayout';
 import HomePage from './pages/HomePage';
@@ -16,8 +17,17 @@ function App() {
           <Route path="search" element={<SearchPage />} />
         </Route>
 
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminLayout />}>
+        {/* Admin Routes - Protected */}
+        <Route path="/admin" element={
+          <>
+            <SignedIn>
+              <AdminLayout />
+            </SignedIn>
+            <SignedOut>
+              <RedirectToSignIn />
+            </SignedOut>
+          </>
+        }>
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="news/new" element={<AdminNewsForm />} />

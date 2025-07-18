@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction, RequestHandler } from 'express';
 import { body, validationResult } from 'express-validator';
 import { dbHelpers } from '../database/database';
+import { requireAuth } from '../middleware/auth';
 
 const { 
   getAllNews, 
@@ -143,7 +144,7 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
 });
 
 // POST /api/news - Create new news article
-router.post('/', async (req: Request<{}, any, CreateNewsBody>, res: Response) => {
+router.post('/', requireAuth, async (req: Request<{}, any, CreateNewsBody>, res: Response) => {
   try {
     const upload = (req.app as any).locals.upload;
     
@@ -243,7 +244,7 @@ router.post('/', async (req: Request<{}, any, CreateNewsBody>, res: Response) =>
 });
 
 // PUT /api/news/:id - Update news article
-router.put('/:id', async (req: Request<{ id: string }, any, CreateNewsBody>, res: Response) => {
+router.put('/:id', requireAuth, async (req: Request<{ id: string }, any, CreateNewsBody>, res: Response) => {
   try {
     const { id } = req.params;
     const upload = (req.app as any).locals.upload;
@@ -355,7 +356,7 @@ router.put('/:id', async (req: Request<{ id: string }, any, CreateNewsBody>, res
 });
 
 // DELETE /api/news/:id - Delete news article
-router.delete('/:id', async (req: Request<{ id: string }>, res: Response) => {
+router.delete('/:id', requireAuth, async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params;
     
