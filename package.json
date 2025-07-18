@@ -1,0 +1,29 @@
+{
+  "name": "mini-cms-case-study",
+  "version": "1.0.0",
+  "description": "Mini CMS for news publishing with admin panel and public site",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "dev:bun": "concurrently \"bun run backend:dev:bun\" \"bun run frontend:dev\"",
+    "backend:dev": "cd backend && npm run dev",
+    "backend:dev:bun": "cd backend && bun run dev:bun",
+    "frontend:dev": "cd frontend && npm run dev",
+    "backend:install": "cd backend && npm install",
+    "backend:install:bun": "cd backend && bun install",
+    "frontend:install": "cd frontend && npm install", 
+    "frontend:install:bun": "cd frontend && bun install",
+    "install:all": "npm run backend:install && npm run frontend:install",
+    "install:all:bun": "bun run backend:install:bun && bun run frontend:install:bun",
+    "build": "cd frontend && npm run build",
+    "build:bun": "cd frontend && bun run build",
+    "start": "cd backend && npm start",
+    "start:bun": "cd backend && bun run start:bun"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["cms", "news", "react", "express", "sqlite"],
+  "author": "AI Generated",
+  "license": "MIT"
+} 
