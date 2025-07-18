@@ -8,11 +8,11 @@ import {
   NewsSearchParams 
 } from '../types/news';
 
-// Global token storage - will be set by auth hook
-let authToken: string | null = null;
+// Global token fetcher function - will be set by auth hook
+let getTokenFunction: (() => Promise<string | null>) | null = null;
 
-export const setAuthToken = (token: string | null) => {
-  authToken = token;
+export const setTokenGetter = (tokenGetter: (() => Promise<string | null>) | null) => {
+  getTokenFunction = tokenGetter;
 };
 
 // Use environment variable for API base URL, fallback to localhost for development
@@ -45,12 +45,19 @@ const api = axios.create({
 
 // Request interceptor for logging and auth
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
     console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
     
     // Add auth token for protected routes
-    if (authToken && (config.method === 'post' || config.method === 'put' || config.method === 'delete')) {
-      config.headers.Authorization = `Bearer ${authToken}`;
+    if (getTokenFunction && (config.method === 'post' || config.method === 'put' || config.method === 'delete')) {
+      try {
+        const token = await getTokenFunction();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.error('Failed to get auth token:', error);
+      }
     }
     
     return config;

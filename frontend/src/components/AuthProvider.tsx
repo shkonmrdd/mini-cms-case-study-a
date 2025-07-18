@@ -1,26 +1,26 @@
 import { useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
-import { setAuthToken } from '../services/api';
+import { setTokenGetter } from '../services/api';
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { getToken, isSignedIn } = useAuth();
 
   useEffect(() => {
-    const updateToken = async () => {
-      if (isSignedIn) {
+    if (isSignedIn) {
+      // Pass the getToken function to the API service
+      // This way, a fresh token is fetched on each request
+      setTokenGetter(async () => {
         try {
-          const token = await getToken();
-          setAuthToken(token);
+          return await getToken();
         } catch (error) {
           console.error('Failed to get auth token:', error);
-          setAuthToken(null);
+          return null;
         }
-      } else {
-        setAuthToken(null);
-      }
-    };
-
-    updateToken();
+      });
+    } else {
+      // Clear the token getter when not signed in
+      setTokenGetter(null);
+    }
   }, [isSignedIn, getToken]);
 
   return <>{children}</>;
