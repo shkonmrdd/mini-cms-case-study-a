@@ -10,7 +10,7 @@
   --muted: #888888;
   --border: #EAE2D2;
   --radius-s: 4px;
-  --radius-m: 8px;
+  --radius-m: 10px;
   
   /* Spacing scale: 4, 8, 16, 24, 48px */
   --spacing-xs: 4px;
@@ -32,7 +32,6 @@
   }
   
   body {
-    
     background: var(--bg);
     color: var(--text);
     margin: 0;
@@ -41,9 +40,16 @@
 
 @layer components {
   .main {
-    width: 768px;
+    max-width: 768px;
     margin: 0 auto;
-    padding: var(--spacing-l) 0 var(--spacing-xl);
+    padding: var(--spacing-l) var(--spacing-m) var(--spacing-xl);
+  }
+
+  /* Mobile: better padding for touch */
+  @media (max-width: 640px) {
+    .main {
+      padding: var(--spacing-l) var(--spacing-m) var(--spacing-l);
+    }
   }
 
   .header {
@@ -54,9 +60,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 768px;
+    max-width: 768px;
     margin: 0 auto;
-    padding: var(--spacing-l) 0;
+    padding: var(--spacing-l) var(--spacing-m);
+  }
+
+  /* Mobile: better header padding and responsive layout */
+  @media (max-width: 640px) {
+    .header {
+      padding: var(--spacing-l) var(--spacing-m);
+      flex-wrap: wrap;
+      gap: var(--spacing-m);
+    }
   }
 
   .header .label {
@@ -79,6 +94,20 @@
     font-family: inherit;
   }
 
+  /* Mobile: responsive search width */
+  @media (max-width: 640px) {
+    .search {
+      width: 140px;
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .search {
+      width: 120px;
+    }
+  }
+
   .search::placeholder {
     color: var(--muted);
   }
@@ -92,6 +121,13 @@
     margin-top: var(--spacing-xl);
   }
 
+  /* Mobile: smaller hero margin */
+  @media (max-width: 640px) {
+    .hero {
+      margin-top: var(--spacing-l);
+    }
+  }
+
   .hero h1 {
     font-size: 40px;
     line-height: 48px;
@@ -100,9 +136,27 @@
     margin: 0 0 var(--spacing-m) 0;
   }
 
+  /* Mobile: smaller hero title */
+  @media (max-width: 640px) {
+    .hero h1 {
+      font-size: 28px;
+      line-height: 36px;
+      margin: 0 0 var(--spacing-s) 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 {
+      font-size: 24px;
+      line-height: 32px;
+    }
+  }
+
   .hero img {
-    width: 494px;
-    height: 236px;
+    width: 100%;
+    max-width: 494px;
+    height: auto;
+    aspect-ratio: 494 / 236;
     object-fit: cover;
     border-radius: 12px;
     border-bottom-left-radius: 0px;
@@ -124,6 +178,14 @@
     margin: var(--spacing-s) 0 0 0;
   }
 
+  /* Mobile: smaller hero text */
+  @media (max-width: 640px) {
+    .hero .excerpt {
+      font-size: 14px;
+      line-height: 22px;
+    }
+  }
+
   .section {
     font-size: 24px;
     line-height: 32px;
@@ -132,10 +194,27 @@
     margin: var(--spacing-xl) 0 var(--spacing-l) 0;
   }
 
+  /* Mobile: smaller section margins */
+  @media (max-width: 640px) {
+    .section {
+      font-size: 20px;
+      line-height: 28px;
+      margin: var(--spacing-l) 0 var(--spacing-m) 0;
+    }
+  }
+
   .cards {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--spacing-l);
+  }
+
+  /* Mobile: single column layout with better spacing */
+  @media (max-width: 640px) {
+    .cards {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-l);
+    }
   }
 
   .card {
@@ -148,12 +227,35 @@
     gap: var(--spacing-m);
   }
 
+  /* Mobile: better card padding for touch */
+  @media (max-width: 640px) {
+    .card {
+      padding: var(--spacing-m);
+      gap: var(--spacing-m);
+    }
+  }
+
   .card img {
-    width: 80px;
-    height: 80px;
-    border-radius: var(--radius-s);
+    width: 105px;
+    height: 105px;
+    border-radius: var(--radius-m);
     object-fit: cover;
     flex-shrink: 0;
+  }
+
+  /* Mobile: slightly larger card images */
+  @media (max-width: 640px) {
+    .card img {
+      width: 100px;
+      height: 100px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .card img {
+      width: 100px;
+      height: 100px;
+    }
   }
 
   .card-content {
@@ -168,12 +270,28 @@
     margin: 0 0 var(--spacing-xs) 0;
   }
 
+  /* Mobile: smaller card title */
+  @media (max-width: 640px) {
+    .card .title {
+      font-size: 16px;
+      line-height: 22px;
+    }
+  }
+
   .card .date {
     font-size: 14px;
     line-height: 20px;
     font-weight: 500;
     color: var(--muted);
     margin: var(--spacing-xs) 0 0 0;
+  }
+
+  /* Mobile: smaller card date */
+  @media (max-width: 640px) {
+    .card .date {
+      font-size: 12px;
+      line-height: 18px;
+    }
   }
 
   .card .excerpt {
@@ -184,6 +302,14 @@
     margin: var(--spacing-xs) 0 0 0;
   }
 
+  /* Mobile: smaller card excerpt */
+  @media (max-width: 640px) {
+    .card .excerpt {
+      font-size: 13px;
+      line-height: 18px;
+    }
+  }
+
   .card .category {
     font-size: 12px;
     line-height: 16px;
@@ -192,6 +318,15 @@
     text-transform: uppercase;
     color: var(--accent);
     margin: var(--spacing-s) 0 0 0;
+  }
+
+  /* Mobile: smaller category text */
+  @media (max-width: 640px) {
+    .card .category {
+      font-size: 11px;
+      line-height: 14px;
+      margin: var(--spacing-xs) 0 0 0;
+    }
   }
 
   /* Admin form utility classes */
@@ -289,6 +424,18 @@
     margin: var(--spacing-s) 0 0 0;
   }
 
+  /* Mobile: smaller category tags */
+  @media (max-width: 640px) {
+    .category-community,
+    .category-business,
+    .category-science,
+    .category-sports {
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      margin: var(--spacing-xs) 0 0 0;
+    }
+  }
+
   /* Category badge classes for admin panel */
   .category-badge-community {
     background-color: rgba(169, 53, 53, 0.1);
@@ -332,6 +479,18 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+  }
+
+  /* Mobile: smaller category badges in admin */
+  @media (max-width: 640px) {
+    .category-badge-community,
+    .category-badge-business,
+    .category-badge-science,
+    .category-badge-sports {
+      font-size: 10px;
+      padding: 3px 6px;
+      letter-spacing: 0.3px;
+    }
   }
 }
 

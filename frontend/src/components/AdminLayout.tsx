@@ -48,7 +48,7 @@ const AdminLayout = () => {
       {/* Main Layout Container */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-sm flex-shrink-0 overflow-y-auto flex flex-col">
+        <aside className="w-64 bg-white shadow-sm flex-shrink-0 overflow-y-auto flex flex-col hidden md:flex">
           <div className="flex-1">
             {/* Back to Public Site */}
             <div className="px-4 pt-6 pb-4 border-b border-gray-200">
@@ -104,8 +104,43 @@ const AdminLayout = () => {
           </div>
         </aside>
 
+        {/* Mobile Navigation */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-40">
+          <div className="flex justify-around">
+            <Link
+              to="/admin/dashboard"
+              className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors ${
+                isActive('/admin/dashboard')
+                  ? 'text-primary-700'
+                  : 'text-gray-600'
+              }`}
+            >
+              <Home size={20} />
+              <span className="text-xs">Dashboard</span>
+            </Link>
+            <Link
+              to="/admin/news/new"
+              className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors ${
+                isActive('/admin/news/new')
+                  ? 'text-primary-700'
+                  : 'text-gray-600'
+              }`}
+            >
+              <Plus size={20} />
+              <span className="text-xs">Add News</span>
+            </Link>
+            <Link
+              to="/"
+              className="flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors text-gray-600"
+            >
+              <ArrowLeft size={20} />
+              <span className="text-xs">Back</span>
+            </Link>
+          </div>
+        </div>
+
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto bg-gray-100 p-8">
+        <main className="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-8 pb-20 md:pb-8">
           <Outlet />
         </main>
       </div>

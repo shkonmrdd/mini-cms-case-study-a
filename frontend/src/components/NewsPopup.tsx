@@ -55,8 +55,9 @@ const NewsPopup = ({ news, isOpen, onClose }: NewsPopupProps) => {
         style={{
           backgroundColor: "white",
           borderRadius: "12px",
-          padding: "30px",
-          maxWidth: "800px",
+          padding: window.innerWidth <= 640 ? "20px" : "30px",
+          maxWidth: window.innerWidth <= 640 ? "100%" : "800px",
+          width: "100%",
           maxHeight: "80vh",
           overflow: "auto",
           position: "relative",

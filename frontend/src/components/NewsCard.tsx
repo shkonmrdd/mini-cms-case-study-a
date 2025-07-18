@@ -43,7 +43,7 @@ const NewsCard = ({ news }: NewsCardProps) => {
     <>
       <article 
         className="card" 
-        style={{ backgroundColor: "#fff8e6", cursor: "pointer" }}
+        style={{ backgroundColor: "#fff8e6", cursor: "pointer", borderRadius: "12px" }}
         onClick={openPopup}
       >
         <div
@@ -57,12 +57,6 @@ const NewsCard = ({ news }: NewsCardProps) => {
           <img
             src={news.image_url || placeholderImage}
             alt={news.title}
-            style={{
-              width: "105px",
-              height: "105px",
-              objectFit: "cover",
-              borderRadius: "8px",
-            }}
           />
           <p className={getCategoryClass(news.category)}>{news.category}</p>
         </div>
