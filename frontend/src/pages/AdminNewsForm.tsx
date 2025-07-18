@@ -208,7 +208,7 @@ const AdminNewsForm = () => {
             </label>
             <textarea
               id="content"
-              rows={12}
+              rows={8}
               {...register('content', { required: 'Content is required' })}
               className="input-field"
               placeholder="Write your news article content here..."

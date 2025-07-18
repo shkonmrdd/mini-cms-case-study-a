@@ -42,7 +42,7 @@
   .main {
     max-width: 768px;
     margin: 0 auto;
-    /* padding: var(--spacing-l) var(--spacing-m) var(--spacing-xl); */
+    padding: var(--spacing-l) var(--spacing-m) var(--spacing-xl);
   }
 
   /* Mobile: better padding for touch */
