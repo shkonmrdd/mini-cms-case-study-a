@@ -70,6 +70,10 @@ async function initializeDatabase(): Promise<void> {
     
   } catch (error) {
     console.error('Error initializing database:', error);
+  } finally {
+    // Close the Prisma connection
+    const { prisma } = await import('../database/database');
+    await prisma.$disconnect();
   }
   
   process.exit(0);

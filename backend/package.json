@@ -9,27 +9,41 @@
     "init-db": "tsx scripts/initDb.ts",
     "dev:bun": "bun --watch server.ts",
     "start:bun": "bun server.ts",
-    "init-db:bun": "bun scripts/initDb.ts"
+    "init-db:bun": "bun scripts/initDb.ts",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "@prisma/client": "^6.12.0",
     "cors": "^2.8.5",
-    "sqlite3": "^5.1.6",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
     "multer": "^1.4.5-lts.1",
-    "uuid": "^9.0.1",
-    "express-validator": "^7.0.1"
+    "pg": "^8.16.3",
+    "prisma": "^6.12.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.10.6",
+    "@types/pg": "^8.15.4",
+    "@types/uuid": "^9.0.7",
     "nodemon": "^3.0.2",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3",
-    "@types/node": "^20.10.6",
-    "@types/express": "^4.17.21",
-    "@types/cors": "^2.8.17",
-    "@types/multer": "^1.4.11",
-    "@types/uuid": "^9.0.7"
+    "typescript": "^5.3.3"
   },
-  "keywords": ["api", "express", "sqlite", "cms"],
+  "keywords": [
+    "api",
+    "express",
+    "postgresql",
+    "prisma",
+    "cms"
+  ],
   "author": "AI Generated",
   "license": "MIT"
-} 
+}

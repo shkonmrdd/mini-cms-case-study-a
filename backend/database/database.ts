@@ -1,5 +1,4 @@
-import sqlite3 from 'sqlite3';
-import path from 'path';
+import { PrismaClient } from '@prisma/client';
 
 // Define interfaces for our data models
 export interface NewsItem {
@@ -8,12 +7,16 @@ export interface NewsItem {
   content: string;
   summary?: string;
   image_url?: string;
+  imageUrl?: string;
   category: string;
   created_at: string;
   updated_at: string;
+  createdAt: Date;
+  updatedAt: Date;
   created_at_formatted: string;
   updated_at_formatted: string;
   is_featured: boolean;
+  isFeatured: boolean;
 }
 
 export interface CreateNewsData {
@@ -21,189 +24,181 @@ export interface CreateNewsData {
   content: string;
   summary?: string;
   image_url?: string;
+  imageUrl?: string;
   category: string;
   is_featured?: boolean;
+  isFeatured?: boolean;
 }
 
-// Create database connection
-const dbPath = path.join(__dirname, 'news.db');
-const db = new sqlite3.Database(dbPath, (err: Error | null) => {
-  if (err) {
-    console.error('Error opening database:', err.message);
-  } else {
-    console.log('Connected to SQLite database at:', dbPath);
-  }
-});
+// Create Prisma client instance
+const prisma = new PrismaClient();
 
-// Create tables if they don't exist
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS news (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    summary TEXT,
-    image_url TEXT,
-    category TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    is_featured BOOLEAN DEFAULT 0
-  )`, (err: Error | null) => {
-    if (err) {
-      console.error('Error creating news table:', err.message);
-    } else {
-      console.log('News table created or already exists');
-    }
-  });
-});
+// Helper function to format dates
+const formatDate = (date: Date): string => {
+  return date.toISOString().slice(0, 19).replace('T', ' ');
+};
 
 // Database helper functions
 export const dbHelpers = {
   // Get all news with optional search and pagination
-  getAllNews: (searchQuery: string = '', page: number = 1, limit: number = 10): Promise<NewsItem[]> => {
-    return new Promise((resolve, reject) => {
-      const offset = (page - 1) * limit;
-      let query = `
-        SELECT *, 
-               datetime(created_at) as created_at_formatted,
-               datetime(updated_at) as updated_at_formatted
-        FROM news 
-      `;
-      let params: (string | number)[] = [];
-      
-      if (searchQuery) {
-        query += ` WHERE title LIKE ? OR content LIKE ? OR category LIKE ?`;
-        params = [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`];
-      }
-      
-      query += ` ORDER BY created_at DESC LIMIT ? OFFSET ?`;
-      params.push(limit, offset);
-      
-      db.all(query, params, (err: Error | null, rows: any[]) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rows as NewsItem[]);
-        }
-      });
+  getAllNews: async (searchQuery: string = '', page: number = 1, limit: number = 10): Promise<NewsItem[]> => {
+    const offset = (page - 1) * limit;
+    
+    const whereClause = searchQuery ? {
+      OR: [
+        { title: { contains: searchQuery, mode: 'insensitive' as const } },
+        { content: { contains: searchQuery, mode: 'insensitive' as const } },
+        { category: { contains: searchQuery, mode: 'insensitive' as const } }
+      ]
+    } : {};
+    
+    const news = await prisma.news.findMany({
+      where: whereClause,
+      orderBy: { createdAt: 'desc' },
+      skip: offset,
+      take: limit
     });
+    
+    return news.map(item => ({
+      ...item,
+      image_url: item.imageUrl, // For backward compatibility
+      is_featured: item.isFeatured, // For backward compatibility
+      created_at: item.createdAt.toISOString(),
+      updated_at: item.updatedAt.toISOString(),
+      created_at_formatted: formatDate(item.createdAt),
+      updated_at_formatted: formatDate(item.updatedAt)
+    }));
   },
 
   // Get news by ID
-  getNewsById: (id: number): Promise<NewsItem | undefined> => {
-    return new Promise((resolve, reject) => {
-      db.get(
-        `SELECT *, 
-                datetime(created_at) as created_at_formatted,
-                datetime(updated_at) as updated_at_formatted
-         FROM news WHERE id = ?`, 
-        [id], 
-        (err: Error | null, row: any) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(row as NewsItem | undefined);
-          }
-        }
-      );
+  getNewsById: async (id: number): Promise<NewsItem | undefined> => {
+    const news = await prisma.news.findUnique({
+      where: { id }
     });
+    
+    if (!news) return undefined;
+    
+    return {
+      ...news,
+      image_url: news.imageUrl, // For backward compatibility
+      is_featured: news.isFeatured, // For backward compatibility
+      created_at: news.createdAt.toISOString(),
+      updated_at: news.updatedAt.toISOString(),
+      created_at_formatted: formatDate(news.createdAt),
+      updated_at_formatted: formatDate(news.updatedAt)
+    };
   },
 
   // Create new news article
-  createNews: (newsData: CreateNewsData): Promise<NewsItem & { id: number }> => {
-    return new Promise((resolve, reject) => {
-      const { title, content, summary, image_url, category, is_featured } = newsData;
-      db.run(
-        `INSERT INTO news (title, content, summary, image_url, category, is_featured) 
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [title, content, summary, image_url, category, is_featured || 0],
-        function(this: sqlite3.RunResult, err: Error | null) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve({ id: this.lastID, ...newsData } as NewsItem & { id: number });
-          }
-        }
-      );
+  createNews: async (newsData: CreateNewsData): Promise<NewsItem & { id: number }> => {
+    const { title, content, summary, imageUrl, image_url, category, isFeatured, is_featured } = newsData;
+    const finalImageUrl = imageUrl || image_url;
+    const finalIsFeatured = isFeatured ?? is_featured ?? false;
+    
+    const news = await prisma.news.create({
+      data: {
+        title,
+        content,
+        summary: summary || null,
+        imageUrl: finalImageUrl || null,
+        category,
+        isFeatured: finalIsFeatured
+      }
     });
+    
+    return {
+      ...news,
+      summary: news.summary || undefined,
+      image_url: news.imageUrl || undefined,
+      imageUrl: news.imageUrl || undefined,
+      is_featured: news.isFeatured,
+      isFeatured: news.isFeatured,
+      created_at: news.createdAt.toISOString(),
+      updated_at: news.updatedAt.toISOString(),
+      createdAt: news.createdAt,
+      updatedAt: news.updatedAt,
+      created_at_formatted: formatDate(news.createdAt),
+      updated_at_formatted: formatDate(news.updatedAt)
+    };
   },
 
   // Update news article
-  updateNews: (id: number, newsData: CreateNewsData): Promise<{ changes: number }> => {
-    return new Promise((resolve, reject) => {
-      const { title, content, summary, image_url, category, is_featured } = newsData;
-      db.run(
-        `UPDATE news 
-         SET title = ?, content = ?, summary = ?, image_url = ?, category = ?, 
-             is_featured = ?, updated_at = CURRENT_TIMESTAMP 
-         WHERE id = ?`,
-        [title, content, summary, image_url, category, is_featured || 0, id],
-        function(this: sqlite3.RunResult, err: Error | null) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve({ changes: this.changes });
-          }
+  updateNews: async (id: number, newsData: CreateNewsData): Promise<{ changes: number }> => {
+    const { title, content, summary, imageUrl, image_url, category, isFeatured, is_featured } = newsData;
+    const finalImageUrl = imageUrl || image_url;
+    const finalIsFeatured = isFeatured ?? is_featured ?? false;
+    
+    try {
+      await prisma.news.update({
+        where: { id },
+        data: {
+          title,
+          content,
+          summary: summary || null,
+          imageUrl: finalImageUrl || null,
+          category,
+          isFeatured: finalIsFeatured
         }
-      );
-    });
+      });
+      
+      return { changes: 1 };
+    } catch (error) {
+      return { changes: 0 };
+    }
   },
 
   // Delete news article
-  deleteNews: (id: number): Promise<{ changes: number }> => {
-    return new Promise((resolve, reject) => {
-      db.run('DELETE FROM news WHERE id = ?', [id], function(this: sqlite3.RunResult, err: Error | null) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ changes: this.changes });
-        }
+  deleteNews: async (id: number): Promise<{ changes: number }> => {
+    try {
+      await prisma.news.delete({
+        where: { id }
       });
-    });
+      
+      return { changes: 1 };
+    } catch (error) {
+      return { changes: 0 };
+    }
   },
 
   // Get featured news
-  getFeaturedNews: (): Promise<NewsItem | null> => {
-    return new Promise((resolve, reject) => {
-      db.all(
-        `SELECT *, 
-                datetime(created_at) as created_at_formatted
-         FROM news 
-         WHERE is_featured = 1 
-         ORDER BY created_at DESC 
-         LIMIT 1`, 
-        (err: Error | null, rows: any[]) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(rows.length > 0 ? rows[0] as NewsItem : null);
-          }
-        }
-      );
+  getFeaturedNews: async (): Promise<NewsItem | null> => {
+    const news = await prisma.news.findFirst({
+      where: { isFeatured: true },
+      orderBy: { createdAt: 'desc' }
     });
+    
+    if (!news) return null;
+    
+    return {
+      ...news,
+      image_url: news.imageUrl, // For backward compatibility
+      is_featured: news.isFeatured, // For backward compatibility
+      created_at: news.createdAt.toISOString(),
+      updated_at: news.updatedAt.toISOString(),
+      created_at_formatted: formatDate(news.createdAt),
+      updated_at_formatted: formatDate(news.updatedAt)
+    };
   },
 
   // Get latest news (non-featured)
-  getLatestNews: (limit: number = 4): Promise<NewsItem[]> => {
-    return new Promise((resolve, reject) => {
-      db.all(
-        `SELECT *, 
-                datetime(created_at) as created_at_formatted
-         FROM news 
-         WHERE is_featured = 0 
-         ORDER BY created_at DESC 
-         LIMIT ?`, 
-        [limit],
-        (err: Error | null, rows: any[]) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(rows as NewsItem[]);
-          }
-        }
-      );
+  getLatestNews: async (limit: number = 4): Promise<NewsItem[]> => {
+    const news = await prisma.news.findMany({
+      where: { isFeatured: false },
+      orderBy: { createdAt: 'desc' },
+      take: limit
     });
+    
+    return news.map(item => ({
+      ...item,
+      image_url: item.imageUrl, // For backward compatibility
+      is_featured: item.isFeatured, // For backward compatibility
+      created_at: item.createdAt.toISOString(),
+      updated_at: item.updatedAt.toISOString(),
+      created_at_formatted: formatDate(item.createdAt),
+      updated_at_formatted: formatDate(item.updatedAt)
+    }));
   }
 };
 
-export { db };
-export default { db, ...dbHelpers }; 
+export { prisma };
+export default { prisma, ...dbHelpers }; 
