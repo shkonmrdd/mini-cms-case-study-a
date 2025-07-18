@@ -1,179 +1,295 @@
 # Mini CMS - News Publishing System
 
-## Описание проекта
+A modern, full-stack news content management system with separate public and admin interfaces. Built entirely using AI-assisted development tools and modern web technologies.
 
-Мини-CMS для публикации новостей с возможностью добавления, редактирования и поиска новостей. Система состоит из отдельного административного интерфейса и публичного сайта.
+## 📸 Preview
 
-## Технологический стек
+![Mini CMS Screenshot](docs/screenshot.jpg)
+
+*Modern news publishing system with clean public interface and secure admin panel*
+
+## ✨ Features
+
+### Public Site
+- 🏠 **Homepage** with featured news and latest articles grid
+- 🔍 **Search functionality** across news titles, content, and categories  
+- 📱 **Responsive design** with modern UI components
+- 🎨 **Category-based color coding** (Community, Business, Science, Sports)
+
+### Admin Panel  
+- 🔐 **Secure authentication** via Clerk
+- ✏️ **Create, edit, and delete** news articles
+- 📷 **Image upload** support (JPG, PNG, GIF, WebP up to 20MB)
+- ⭐ **Featured article** designation for homepage
+- 📊 **Admin dashboard** with article management
+- ✅ **Form validation** on both frontend and backend
+
+## 🛠 Tech Stack
 
 ### Backend
-- **Node.js** + **Express.js** + **TypeScript** - API сервер  
-- **SQLite** - База данных
-- **Multer** - Загрузка изображений
-- **Express Validator** - Валидация данных
-- **tsx** / **bun** - TypeScript runtime
+- **Node.js** + **Express.js** + **TypeScript** - REST API server
+- **Prisma ORM** + **PostgreSQL** - Database with type-safe queries  
+- **Clerk** - Authentication and user management
+- **Multer** - File upload handling
+- **Express Validator** - Input validation
+- **Bun/tsx** - Fast TypeScript runtime
 
 ### Frontend  
-- **React 18** + **TypeScript** - UI компоненты
-- **Vite** - Сборщик и dev сервер
-- **Tailwind CSS** - Стилизация
-- **React Router** - Роутинг
-- **React Query** - Управление состоянием
-- **React Hook Form** - Работа с формами
+- **React 18** + **TypeScript** - Component-based UI
+- **Vite** - Build tool and development server
+- **Tailwind CSS** - Utility-first styling
+- **React Router** - Client-side routing
+- **React Query** - Server state management
+- **React Hook Form** - Form handling
+- **Clerk React** - Authentication components
 
-## Установка и запуск
+## 🚀 Quick Start
 
-### 1. Клонирование и установка зависимостей
+### Prerequisites
+- Node.js 18+ or Bun
+- PostgreSQL database
+- Clerk account for authentication
 
+### 1. Clone and Install
 ```bash
-# Клонировать репозиторий
 git clone <your-repo-url>
 cd mini-cms-case-study
 
-# Установить все зависимости
+# Install all dependencies
 npm run install:all
+# or with bun (recommended)
+bun run install:all:bun
 ```
 
-### 2. Инициализация базы данных
+### 2. Environment Setup
 
+Create `.env` files:
+
+**Backend** (`backend/.env`):
+```env
+DATABASE_URL="postgresql://username:password@localhost:5432/mini_cms"
+CLERK_SECRET_KEY="sk_test_your_clerk_secret_key"
+CLERK_PUBLISHABLE_KEY="pk_test_your_clerk_publishable_key"
+NODE_ENV="development"
+PORT=5001
+```
+
+**Frontend** (`frontend/.env`):
+```env
+VITE_CLERK_PUBLISHABLE_KEY="pk_test_your_clerk_publishable_key"
+VITE_API_BASE_URL="http://localhost:5001/api"
+```
+
+### 3. Database Setup
 ```bash
-# Создать базу данных и добавить тестовые данные
 cd backend
+
+# Generate Prisma client
+npm run db:generate
+
+# Run database migrations
+npm run db:migrate
+
+# Seed with sample data
 npm run init-db
+
 cd ..
 ```
 
-### 3. Запуск приложения
-
+### 4. Start Development
 ```bash
-# Запустить одновременно backend (порт 5000) и frontend (порт 3049)
+# Start both backend and frontend
 npm run dev
-
-# Или используя bun (рекомендуется для быстрой разработки)
+# or with bun
 bun run dev:bun
 ```
 
-Альтернативно можно запускать сервисы отдельно:
+**URLs:**
+- Frontend: http://localhost:3049
+- Backend API: http://localhost:5001
+- Admin Panel: http://localhost:3049/admin
 
-```bash
-# Backend (порт 5000)
-npm run backend:dev
-# или с bun
-bun run backend:dev:bun
+## 📚 Usage Guide
 
-# Frontend (порт 3049) 
-npm run frontend:dev
+### Public Site Access
+1. Visit http://localhost:3049 for the homepage
+2. Use the search bar in the header to find articles
+3. Click on articles to view details in a popup
+
+### Admin Access  
+1. Click "Admin" in the header or visit http://localhost:3049/admin
+2. Sign in via Clerk authentication
+3. Access the dashboard to manage articles
+
+### Managing Articles
+- **Create**: Click "Add News" button in admin dashboard
+- **Edit**: Click edit icon in the articles table
+- **Delete**: Click delete icon (with confirmation)
+- **Feature**: Toggle the "Featured" checkbox to highlight on homepage
+
+## 🔌 API Endpoints
+
+### Public Endpoints
+```
+GET  /api/news              # All news with pagination & search
+GET  /api/news/featured     # Featured article
+GET  /api/news/latest       # Latest articles
+GET  /api/news/:id          # Single article by ID
 ```
 
-## Использование системы
+### Protected Endpoints (Auth Required)
+```
+POST   /api/news            # Create new article
+PUT    /api/news/:id        # Update article
+DELETE /api/news/:id        # Delete article
+```
 
-### Публичный сайт (http://localhost:3049)
+### Search & Filtering
+```
+GET /api/news?search=query&page=1&limit=10&category=BUSINESS
+```
 
-1. **Главная страница** - отображает featured новость и последние новости в виде сетки
-2. **Поиск** - используйте поисковую строку в хедере для поиска по новостям
-3. **Навигация** - переход в админ панель через "Admin Panel" в хедере
-
-### Админ панель (http://localhost:3049/admin)
-
-1. **Dashboard** - список всех новостей с возможностью редактирования и удаления
-2. **Добавление новости** - кнопка "Add News" или прямой переход на `/admin/news/new`
-3. **Редактирование** - клик на иконку редактирования в таблице новостей
-
-### Возможности админки
-
-- ✅ Создание новых новостей
-- ✅ Редактирование существующих новостей  
-- ✅ Удаление новостей
-- ✅ Загрузка изображений (JPG, PNG, GIF до 5MB)
-- ✅ Назначение статуса "Featured" (отображается как главная новость)
-- ✅ Категории: COMMUNITY, BUSINESS, SCIENCE, SPORTS
-- ✅ Валидация форм
-
-### API Endpoints
-
-#### Получение новостей
-- `GET /api/news` - все новости (с пагинацией и поиском)
-- `GET /api/news/featured` - featured новость
-- `GET /api/news/latest` - последние новости
-- `GET /api/news/:id` - конкретная новость
-
-#### Управление новостями
-- `POST /api/news` - создание новости
-- `PUT /api/news/:id` - обновление новости  
-- `DELETE /api/news/:id` - удаление новости
-
-#### Поиск
-- `GET /api/news?search=query` - поиск по заголовку, контенту и категории
-
-## Структура проекта
+## 📁 Project Structure
 
 ```
 mini-cms-case-study/
-├── backend/                 # Express.js API
-│   ├── database/           # SQLite база данных
-│   ├── routes/            # API маршруты
-│   ├── scripts/           # Утилиты (инициализация БД)
-│   └── server.js          # Главный файл сервера
-├── frontend/               # React приложение
+├── backend/                 # Express.js API server
+│   ├── prisma/             # Database schema & migrations
+│   ├── routes/             # API route handlers
+│   ├── middleware/         # Auth & validation middleware
+│   ├── database/           # Database utilities
+│   ├── scripts/            # Database seeding scripts
+│   └── server.ts           # Main server file
+├── frontend/               # React application
 │   ├── src/
-│   │   ├── components/    # React компоненты
-│   │   ├── pages/         # Страницы приложения
-│   │   ├── services/      # API клиент
-│   │   ├── types/         # TypeScript типы
-│   │   └── utils/         # Утилиты
-│   └── public/            # Статические файлы
-├── uploads/               # Загруженные изображения
-└── package.json          # Корневой package.json
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Page components
+│   │   ├── services/       # API client & utilities
+│   │   ├── types/          # TypeScript type definitions
+│   │   └── hooks/          # Custom React hooks
+│   └── dist/               # Built files (production)
+├── uploads/                # User-uploaded images
+└── package.json            # Root workspace configuration
 ```
 
-## Дизайн системы
+## 🔒 Authentication & Security
 
-Система реализована согласно приложенному дизайну:
+This application uses **Clerk** for secure authentication:
 
-- ✅ Хедер с логотипом "News" и поисковой строкой
-- ✅ Featured новость в большом формате
-- ✅ Секция "Latest News" с сеткой новостей
-- ✅ Цветные категории (COMMUNITY - оранжевый, BUSINESS - синий, и т.д.)
-- ✅ Responsive дизайн
-- ✅ Современные UI компоненты с Tailwind CSS
+- ✅ **JWT token verification** on protected API routes
+- ✅ **Frontend route protection** with React components
+- ✅ **Automatic token refresh** and management
+- ✅ **Production-ready** security implementation
 
-## Особенности реализации
+Public routes (news viewing, search) work without authentication. Admin routes require sign-in.
 
-### AI-генерация кода
-- Весь код создан с помощью AI (Claude) 
-- Использованы современные best practices
-- TypeScript для типобезопасности
-- Валидация на frontend и backend
+## 🎨 Design Features
 
-### No-code элементы
-- Быстрая настройка с помощью Vite
-- Готовые UI компоненты Tailwind CSS
-- Простая SQLite база данных
-- Автоматическая генерация API
+- **Modern UI** with Tailwind CSS components
+- **Responsive layout** for mobile and desktop  
+- **Category color coding** for visual organization
+- **Featured article highlighting** on homepage
+- **Clean admin interface** with intuitive navigation
+- **Loading states and error handling**
 
-## Возможные улучшения
+## 🚀 Production Deployment
 
-- [ ] Аутентификация админов
-- [ ] Более продвинутый текстовый редактор
-- [ ] Кеширование изображений
-- [ ] Пагинация в админке
-- [ ] Предпросмотр новостей
-- [ ] SEO оптимизация
+The project includes comprehensive deployment guides for:
+- **Render.com** (recommended) - Free PostgreSQL + hosting
+- **Vercel + Railway** - Optimized frontend + backend separation
 
-## Troubleshooting
+See `DEPLOYMENT.md` for detailed instructions.
 
-### Проблемы с запуском
+## 🧪 AI-Generated Code
 
-1. **Порты заняты** - убедитесь что порты 3049 и 5000 свободны
-2. **Ошибки зависимостей** - выполните `npm install` в каждой папке отдельно
-3. **База данных** - если возникают ошибки, удалите файл `backend/database/news.db` и повторно выполните `npm run init-db`
+This entire project was built using AI assistance:
+- **No hand-written code** - purely AI-generated
+- **Modern best practices** throughout
+- **TypeScript for type safety**
+- **Comprehensive validation** on both ends
+- **Production-ready architecture**
 
-### Ошибки в консоли
+## 🛠 Available Scripts
 
-- Проверьте что backend запущен на порту 5000
-- Убедитесь что все зависимости установлены
-- Проверьте CORS настройки если возникают проблемы с API
+### Root Level
+```bash
+npm run dev              # Start both backend & frontend
+npm run install:all      # Install all dependencies
+npm run build           # Build frontend for production
+```
 
-## Лицензия
+### Backend Scripts
+```bash
+npm run dev             # Start development server
+npm run db:migrate      # Run database migrations  
+npm run db:studio       # Open Prisma Studio
+npm run init-db         # Seed database with sample data
+```
 
-MIT License - проект создан для демонстрационных целей. 
+### Frontend Scripts
+```bash
+npm run dev             # Start Vite development server
+npm run build           # Build for production
+npm run preview         # Preview production build
+```
+
+## 🔧 Development Tips
+
+### Using Bun (Recommended)
+```bash
+# Faster installation and runtime
+bun run install:all:bun
+bun run dev:bun
+```
+
+### Database Management
+```bash
+# Reset database completely
+cd backend && npm run db:reset
+
+# View data in browser
+npm run db:studio
+```
+
+### Debugging
+- Backend API logs all requests in development
+- Frontend includes React Query DevTools
+- Check browser console for detailed error messages
+
+## 📋 Requirements Checklist
+
+- ✅ **AI-generated codebase** with no manual coding
+- ✅ **Separate admin and public interfaces**
+- ✅ **News article CRUD operations**
+- ✅ **Image upload functionality**
+- ✅ **Search across articles**
+- ✅ **Modern, responsive design**
+- ✅ **Type-safe development** with TypeScript
+- ✅ **Production-ready deployment** options
+- ✅ **Secure authentication** implementation
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Database Connection:**
+- Ensure PostgreSQL is running
+- Check DATABASE_URL format in backend/.env
+
+**Authentication Errors:**
+- Verify Clerk keys are set correctly
+- Check that keys match between frontend and backend
+
+**Port Conflicts:**
+- Backend uses port 5001, frontend uses 3049
+- Change ports in package.json scripts if needed
+
+**File Upload Issues:**
+- Check uploads/ directory permissions
+- Verify file size limits (20MB max)
+
+### Support
+Check existing documentation:
+- `CLERK_SETUP.md` - Authentication setup
+- `DEPLOYMENT.md` - Production deployment
+- `MIGRATION_TO_PRISMA.md` - Database information
