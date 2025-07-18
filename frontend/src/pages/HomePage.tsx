@@ -1,9 +1,13 @@
 import { useQuery } from 'react-query';
+import { useState } from 'react';
 import { newsApi } from '../services/api';
 import NewsCard from '../components/NewsCard';
+import NewsPopup from '../components/NewsPopup';
 import { NewsItem } from '../types/news';
 
 const HomePage = () => {
+  const [featuredPopupOpen, setFeaturedPopupOpen] = useState(false);
+
   const { data: featuredNews, isLoading: featuredLoading } = useQuery<NewsItem | null>(
     'featured-news',
     newsApi.getFeatured
@@ -13,6 +17,9 @@ const HomePage = () => {
     'latest-news',
     () => newsApi.getLatest(10)
   );
+
+  const openFeaturedPopup = () => setFeaturedPopupOpen(true);
+  const closeFeaturedPopup = () => setFeaturedPopupOpen(false);
 
   if (featuredLoading || latestLoading) {
     return (
@@ -38,7 +45,11 @@ const HomePage = () => {
     <div>
       {/* Featured News */}
       {featuredNews && (
-        <article className="hero">
+        <article 
+          className="hero" 
+          style={{ cursor: "pointer" }}
+          onClick={openFeaturedPopup}
+        >
           <h1>{featuredNews.title}</h1>
           <img
             src={featuredNews.image_url || `https://images.unsplash.com/photo-1504711434969-e33886168f5c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80`}
@@ -73,8 +84,17 @@ const HomePage = () => {
           </div>
         )}
       </section>
+
+      {/* Featured News Popup */}
+      {featuredNews && (
+        <NewsPopup 
+          news={featuredNews} 
+          isOpen={featuredPopupOpen} 
+          onClose={closeFeaturedPopup} 
+        />
+      )}
     </div>
-  );
+  )
 };
 
 export default HomePage; 
