@@ -167,16 +167,15 @@ const handleFileStorage = (file: Express.Multer.File, req: any): string | undefi
     ? 'https://mini-cms-case-study.onrender.com'
     : `http://localhost:5001`;
   
-  if (process.env.NODE_ENV === 'production') {
-    // In production with memory storage, we'd typically upload to cloud storage
-    // For now, we'll return null to indicate no image instead of a broken placeholder
-    console.log('File upload in production - size:', file.size, 'type:', file.mimetype);
-    console.log('Note: File stored in memory, not persisted in production');
-    return undefined; // No image in production for now
-  } else {
-    // Development: file is saved to disk, return absolute URL
-    return `${baseUrl}/uploads/${file.filename}`;
-  }
+  // File is saved to disk with unique filename - return absolute URL
+  console.log('File uploaded successfully:', {
+    filename: file.filename,
+    originalname: file.originalname,
+    size: file.size,
+    mimetype: file.mimetype
+  });
+  
+  return `${baseUrl}/uploads/${file.filename}`;
 };
 
 // POST /api/news - Create new news article

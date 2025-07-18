@@ -47,23 +47,21 @@ try {
 // Serve uploaded images
 app.use('/uploads', express.static(uploadsDir));
 
-// Configure multer for file uploads with production-safe settings
-const storage: StorageEngine = process.env.NODE_ENV === 'production' 
-  ? multer.memoryStorage() // Use memory storage for production
-  : multer.diskStorage({
-      destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-        cb(null, uploadsDir);
-      },
-      filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-        const uniqueName = uuidv4() + path.extname(file.originalname);
-        cb(null, uniqueName);
-      }
-    });
+// Configure multer for file uploads - use disk storage for both dev and production
+const storage: StorageEngine = multer.diskStorage({
+  destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+    const uniqueName = uuidv4() + path.extname(file.originalname);
+    cb(null, uniqueName);
+  }
+});
 
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: process.env.NODE_ENV === 'production' ? 20 * 1024 * 1024 : 20 * 1024 * 1024 // 2MB for production, 5MB for dev
+    fileSize: 5 * 1024 * 1024 // 5MB limit for all environments
   },
   fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
