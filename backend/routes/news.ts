@@ -1,7 +1,22 @@
 import express, { Request, Response, NextFunction, RequestHandler } from 'express';
 import { body, validationResult } from 'express-validator';
 import { dbHelpers } from '../database/database';
-import { requireAuth } from '../middleware/auth';
+import { getAuth } from '@clerk/express';
+
+// Secure authentication middleware using Clerk's proper verification
+const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
+  const auth = getAuth(req);
+  
+  if (!auth.userId) {
+    res.status(401).json({
+      success: false,
+      message: 'Authentication required'
+    });
+    return;
+  }
+  
+  next();
+};
 
 const { 
   getAllNews, 

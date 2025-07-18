@@ -5,8 +5,8 @@
   "main": "server.ts",
   "scripts": {
     "dev": "nodemon --exec tsx server.ts",
-    "start": "tsx server.ts",
-    "init-db": "tsx scripts/initDb.ts",
+    "start": "bun server.ts",
+    "init-db": "bun scripts/initDb.ts",
     "dev:bun": "bun --watch server.ts",
     "start:bun": "bun server.ts",
     "init-db:bun": "bun scripts/initDb.ts",

@@ -17,4 +17,12 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    minify: 'terser',
+  },
+  define: {
+    // Define any global constants if needed
+  }
 }) 

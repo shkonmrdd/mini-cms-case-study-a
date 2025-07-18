@@ -4,6 +4,7 @@ import path from 'path';
 import { body, validationResult } from 'express-validator';
 import multer, { StorageEngine } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+import { clerkMiddleware } from '@clerk/express';
 
 // Import database and routes
 import db from './database/database';
@@ -12,8 +13,24 @@ import newsRoutes from './routes/news';
 const app: Application = express();
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 5001;
 
-// Middleware
-app.use(cors());
+// Secure Clerk middleware - MUST come first to properly verify JWT tokens
+app.use(clerkMiddleware({
+  secretKey: process.env.CLERK_SECRET_KEY,
+  publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+  authorizedParties: process.env.NODE_ENV === 'production' 
+    ? ['https://mini-cms-frontend.onrender.com']
+    : ['http://localhost:3049', 'http://localhost:3000'],
+}));
+
+// CORS middleware
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://mini-cms-frontend.onrender.com', 'https://mini-cms-backend.onrender.com']
+    : ['http://localhost:3049', 'http://localhost:3000'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -55,9 +72,9 @@ app.locals.upload = upload;
 // Routes
 app.use('/api/news', newsRoutes);
 
-// Basic health check endpoint
+// Health check endpoint for Render.com
 app.get('/api/health', (req: Request, res: Response) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
 // Error handling middleware
