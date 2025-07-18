@@ -25,7 +25,7 @@ app.use(clerkMiddleware({
 // CORS middleware
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://mini-cms-frontend.onrender.com', 'https://mini-cms-backend.onrender.com']
+    ? ['https://mini-cms-frontend.onrender.com', 'https://mini-cms-case-study.onrender.com']
     : ['http://localhost:3049', 'http://localhost:3000'],
   credentials: true
 };
