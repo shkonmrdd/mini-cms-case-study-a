@@ -159,17 +159,23 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
 });
 
 // Helper function to handle file storage
-const handleFileStorage = (file: Express.Multer.File): string | undefined => {
+const handleFileStorage = (file: Express.Multer.File, req: any): string | undefined => {
   if (!file) return undefined;
+  
+  // Get the base URL for the backend
+  const baseUrl = process.env.NODE_ENV === 'production' 
+    ? 'https://mini-cms-case-study.onrender.com'
+    : `http://localhost:5001`;
   
   if (process.env.NODE_ENV === 'production') {
     // In production with memory storage, we'd typically upload to cloud storage
-    // For now, we'll return a placeholder since file upload on free Render is limited
+    // For now, we'll return null to indicate no image instead of a broken placeholder
     console.log('File upload in production - size:', file.size, 'type:', file.mimetype);
-    return '/uploads/placeholder-image.jpg'; // Placeholder for production
+    console.log('Note: File stored in memory, not persisted in production');
+    return undefined; // No image in production for now
   } else {
-    // Development: file is saved to disk
-    return '/uploads/' + file.filename;
+    // Development: file is saved to disk, return absolute URL
+    return `${baseUrl}/uploads/${file.filename}`;
   }
 };
 
@@ -269,7 +275,7 @@ router.post('/', requireAuth, async (req: Request<{}, any, CreateNewsBody>, res:
         summary: req.body.summary || '',
         category: req.body.category,
         is_featured: req.body.is_featured === 'true' || req.body.is_featured === true,
-        image_url: handleFileStorage((req as any).file)
+        image_url: handleFileStorage((req as any).file, req)
       };
       
       const createdNews = await createNews(newsData);
@@ -397,7 +403,7 @@ router.put('/:id', requireAuth, async (req: Request<{ id: string }, any, CreateN
         summary: req.body.summary || '',
         category: req.body.category,
         is_featured: req.body.is_featured === 'true' || req.body.is_featured === true,
-        image_url: (req as any).file ? handleFileStorage((req as any).file) : existingNews.image_url
+        image_url: (req as any).file ? handleFileStorage((req as any).file, req) : existingNews.image_url
       };
       
       await updateNews(Number(id), newsData);

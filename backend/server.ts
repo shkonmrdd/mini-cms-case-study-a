@@ -63,7 +63,7 @@ const storage: StorageEngine = process.env.NODE_ENV === 'production'
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: process.env.NODE_ENV === 'production' ? 2 * 1024 * 1024 : 5 * 1024 * 1024 // 2MB for production, 5MB for dev
+    fileSize: process.env.NODE_ENV === 'production' ? 20 * 1024 * 1024 : 20 * 1024 * 1024 // 2MB for production, 5MB for dev
   },
   fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;

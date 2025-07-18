@@ -18,6 +18,26 @@ export const setAuthToken = (token: string | null) => {
 // Use environment variable for API base URL, fallback to localhost for development
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
+// Helper function to convert relative image URLs to absolute URLs
+const processImageUrl = (imageUrl: string | null | undefined): string | undefined => {
+  if (!imageUrl) return undefined;
+  
+  // If it's already an absolute URL, return as-is
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+  
+  // If it's a relative URL starting with /uploads, make it absolute
+  if (imageUrl.startsWith('/uploads/')) {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL 
+      ? import.meta.env.VITE_API_BASE_URL.replace('/api', '')
+      : 'http://localhost:5001';
+    return `${baseUrl}${imageUrl}`;
+  }
+  
+  return imageUrl;
+};
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
@@ -59,13 +79,19 @@ export const newsApi = {
   // Get all news with optional search and pagination
   getAll: async (params?: NewsSearchParams): Promise<NewsItem[]> => {
     const response = await api.get<PaginatedResponse<NewsItem[]>>('/news', { params });
-    return response.data.data;
+    return response.data.data.map(item => ({
+      ...item,
+      image_url: processImageUrl(item.image_url)
+    }));
   },
 
   // Get single news by ID
   getById: async (id: number): Promise<NewsItem> => {
     const response = await api.get<ApiResponse<NewsItem>>(`/news/${id}`);
-    return response.data.data;
+    return {
+      ...response.data.data,
+      image_url: processImageUrl(response.data.data.image_url)
+    };
   },
 
   // Get featured news

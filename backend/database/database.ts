@@ -88,7 +88,7 @@ export const dbHelpers = {
     
     return {
       ...news,
-      image_url: news.imageUrl, // For backward compatibility
+      image_url: news.imageUrl || undefined, // For backward compatibility
       is_featured: news.isFeatured, // For backward compatibility
       created_at: news.createdAt.toISOString(),
       updated_at: news.updatedAt.toISOString(),
