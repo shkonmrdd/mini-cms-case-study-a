@@ -22,7 +22,7 @@ const AdminLayout = () => {
               </h1>
             </div>
 
-            {/* User Menu and Back to Public Site */}
+            {/* User Menu */}
             <div className="flex items-center space-x-4">
               {/* User Info */}
               <div className="flex items-center space-x-3">
@@ -40,15 +40,6 @@ const AdminLayout = () => {
                   <LogOut size={18} />
                 </button>
               </div>
-              
-              {/* Back to Public Site */}
-              <Link
-                to="/"
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
-              >
-                <ArrowLeft size={20} />
-                <span>Back to Site</span>
-              </Link>
             </div>
           </div>
         </div>
@@ -57,6 +48,17 @@ const AdminLayout = () => {
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-64 bg-white shadow-sm min-h-screen">
+          {/* Back to Public Site */}
+          <div className="px-4 pt-6 pb-4 border-b border-gray-200">
+            <Link
+              to="/"
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+            >
+              <ArrowLeft size={20} />
+              <span>Back to Site</span>
+            </Link>
+          </div>
+          
           <nav className="mt-8">
             <div className="px-4">
               <ul className="space-y-2">
