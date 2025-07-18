@@ -99,7 +99,7 @@ router.get('/featured', async (req: Request, res: Response) => {
 // GET /api/news/latest - Get latest news
 router.get('/latest', async (req: Request<{}, any, {}, { limit?: string }>, res: Response) => {
   try {
-    const { limit = '4' } = req.query;
+    const { limit = '10' } = req.query;
     const latestNews = await getLatestNews(parseInt(limit));
     res.json({
       success: true,

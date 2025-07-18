@@ -1,7 +1,8 @@
 import { Outlet, Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { User, LayoutDashboard } from 'lucide-react';
+import { User, Pencil } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import Footer from './Footer';
 
 const PublicLayout = () => {
   const navigate = useNavigate();
@@ -30,6 +31,9 @@ const PublicLayout = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <form onSubmit={handleSearch}>
             <input
+              style={{
+                backgroundColor: '#fff8e6',
+              }}
               type="text"
               placeholder="Search…"
               value={searchQuery}
@@ -72,7 +76,7 @@ const PublicLayout = () => {
                   }}
                   title="Admin Panel"
                 >
-                  <LayoutDashboard size={20} />
+                  <Pencil size={20} />
                 </Link>
                 <UserButton />
               </div>
@@ -85,6 +89,9 @@ const PublicLayout = () => {
       <main className="main">
         <Outlet />
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

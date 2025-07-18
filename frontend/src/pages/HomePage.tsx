@@ -11,7 +11,7 @@ const HomePage = () => {
 
   const { data: latestNews, isLoading: latestLoading } = useQuery<NewsItem[]>(
     'latest-news',
-    () => newsApi.getLatest(4)
+    () => newsApi.getLatest(10)
   );
 
   if (featuredLoading || latestLoading) {

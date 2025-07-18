@@ -60,13 +60,21 @@ export const dbHelpers = {
     });
     
     return news.map(item => ({
-      ...item,
-      image_url: item.imageUrl, // For backward compatibility
-      is_featured: item.isFeatured, // For backward compatibility
+      id: item.id,
+      title: item.title,
+      content: item.content,
+      summary: item.summary || undefined, // Convert null to undefined
+      image_url: item.imageUrl || undefined, // For backward compatibility, convert null to undefined
+      imageUrl: item.imageUrl || undefined, // Convert null to undefined
+      category: item.category,
       created_at: item.createdAt.toISOString(),
       updated_at: item.updatedAt.toISOString(),
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
       created_at_formatted: formatDate(item.createdAt),
-      updated_at_formatted: formatDate(item.updatedAt)
+      updated_at_formatted: formatDate(item.updatedAt),
+      is_featured: item.isFeatured, // For backward compatibility
+      isFeatured: item.isFeatured
     }));
   },
 
@@ -181,7 +189,7 @@ export const dbHelpers = {
   },
 
   // Get latest news (non-featured)
-  getLatestNews: async (limit: number = 4): Promise<NewsItem[]> => {
+  getLatestNews: async (limit: number = 10): Promise<NewsItem[]> => {
     const news = await prisma.news.findMany({
       where: { isFeatured: false },
       orderBy: { createdAt: 'desc' },
