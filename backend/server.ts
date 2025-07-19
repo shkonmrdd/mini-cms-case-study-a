@@ -1,13 +1,12 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import path from 'path';
-import { body, validationResult } from 'express-validator';
+
 import multer, { StorageEngine } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { clerkMiddleware } from '@clerk/express';
 
-// Import database and routes
-import db from './database/database';
+
 import newsRoutes from './routes/news';
 
 const app: Application = express();
